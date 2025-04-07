@@ -20,17 +20,17 @@ class SpectrogramUNet(nn.Module):
         self.encoder = nn.ModuleList([
             self.encoder_block(1, 8, 8),
             self.encoder_block(8, 16, 8),
-            self.encoder_block(16, 32, 6),
-            self.encoder_block(32, 64, 6),
-            self.encoder_block(64, 64, 4),
-            self.encoder_block(64, 64, 4)
+            self.encoder_block(16, 32, 2),
+            self.encoder_block(32, 64, 2),
+            self.encoder_block(64, 64, 1),
+            self.encoder_block(64, 64, 1)
         ])
 
         self.decoder = nn.ModuleList([
-            self.decoder_block(64, 64, 4),
-            self.decoder_block(128, 64, 4),
-            self.decoder_block(128, 32, 6),
-            self.decoder_block(64, 16, 6),
+            self.decoder_block(64, 64, 1),
+            self.decoder_block(128, 64, 1),
+            self.decoder_block(128, 32, 2),
+            self.decoder_block(64, 16, 2),
             self.decoder_block(32, 8, 8),
             self.decoder_block(16, 1, 8)
         ])
@@ -99,5 +99,4 @@ optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-5)
 print(f"输入尺寸: {dummy_input.shape}")
 print(f"输出尺寸: {output.shape}")
 print(f"L1损失计算验证: {loss.item():.4f}")
-
 

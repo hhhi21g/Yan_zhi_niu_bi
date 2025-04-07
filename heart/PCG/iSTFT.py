@@ -29,6 +29,7 @@ class STFT(torch.nn.Module, metaclass=Singleton):
         fourier_basis = np.vstack([np.real(fourier_basis[:cutoff, :]),
                                    np.imag(fourier_basis[:cutoff, :])])
         forward_basis = torch.FloatTensor(fourier_basis[:, None, :])
+        # inverse_basis = torch.FloatTensor(np.linalg.pinv(scale * fourier_basis).T[:, None, :])
         inverse_basis = torch.FloatTensor(np.linalg.pinv(scale * fourier_basis).T[:, None, :])
 
         self.register_buffer('forward_basis', forward_basis.float())
@@ -48,10 +49,31 @@ class STFT(torch.nn.Module, metaclass=Singleton):
         imag_part = forward_transform[:, cutoff:, :]
 
         magnitude = torch.sqrt(real_part ** 2 + imag_part ** 2 + 1e-10)
-        phase = torch.autograd.Variable(torch.atan2(imag_part.data, real_part.data))
+        # phase = torch.autograd.Variable(torch.atan2(imag_part.data, real_part.data))
+        phase = torch.atan2(imag_part, real_part)
+
+        # 频率维度的一致性检查
+        if magnitude.size(1) != phase.size(1):
+            # 确保 phase 和 magnitude 的频率维度相同
+            if magnitude.size(1) == phase.size(1) - 1:
+                # phase 频率维度比 magnitude 多 1，删除多余的部分
+                phase = phase[:, :-1, :]
+            else:
+                raise ValueError(f"Size mismatch: magnitude {magnitude.size(1)} vs phase {phase.size(1)}")
+
         return magnitude, phase
 
     def inverse(self, magnitude, phase):
+        # 确保magnitude和phase在频率维度上的大小一致
+        # 频率维度的一致性检查
+        if magnitude.size(1) != phase.size(1):
+            # 确保 phase 和 magnitude 的频率维度相同
+            if magnitude.size(1) == phase.size(1) - 1:
+                # phase 频率维度比 magnitude 多 1，删除多余的部分
+                phase = phase[:, :-1, :]
+            else:
+                raise ValueError(f"Size mismatch: magnitude {magnitude.size(1)} vs phase {phase.size(1)}")
+
         recombine_magnitude_phase = torch.cat([magnitude * torch.cos(phase),
                                                magnitude * torch.sin(phase)], dim=1)
 

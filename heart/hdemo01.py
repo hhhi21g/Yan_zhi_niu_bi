@@ -8,8 +8,9 @@ from scipy.spatial.distance import euclidean
 import soundfile as sf
 
 matplotlib.use('TkAgg')
-y, sr = librosa.load("data/sony.wav", sr=11025)
+y, sr = librosa.load("data/output.wav", sr=11025)
 time = np.arange(len(y)) / sr  # 时间轴（秒）
+
 
 # 2. 低通滤波
 def lowpass_filter(data, sr, cutoff=220):
@@ -18,13 +19,16 @@ def lowpass_filter(data, sr, cutoff=220):
     b, a = signal.butter(10, norm_cutoff, btype='low')
     return signal.filtfilt(b, a, data)
 
+
 filtered = lowpass_filter(y, sr)
+
 
 def noise_suppression(data):
     D = librosa.stft(data)
     S, phase = librosa.magphase(D)
     S_denoised = librosa.decompose.nn_filter(S, aggregate=np.median)
     return librosa.istft(S_denoised * phase)
+
 
 filtered_denoised = noise_suppression(filtered)
 
@@ -41,9 +45,11 @@ energy_time = np.arange(len(energy)) * (frame_length / sr)  # 能量时间轴
 energy_threshold = np.median(energy) * 0.5  # 设定为能量中值的一半
 filtered_energy = energy > energy_threshold  # 仅保留能量高于阈值的部分
 
-filtered_energy_interp = np.interp(np.arange(len(filtered_denoised)), np.arange(0, len(filtered_denoised), frame_length), filtered_energy)
+filtered_energy_interp = np.interp(np.arange(len(filtered_denoised)),
+                                   np.arange(0, len(filtered_denoised), frame_length), filtered_energy)
 # 仅保留高能量部分的信号
-filtered_denoised_high_energy = np.array([filtered_denoised[i] if filtered_energy_interp[i] else 0 for i in range(len(filtered_denoised))])
+filtered_denoised_high_energy = np.array(
+    [filtered_denoised[i] if filtered_energy_interp[i] else 0 for i in range(len(filtered_denoised))])
 
 # 检测能量峰值（S1/S2位置）
 peaks, _ = signal.find_peaks(
@@ -88,21 +94,20 @@ for i, (start, end) in enumerate(s1_s2_segments):
 # ===== 6. 模板匹配与身份验证 =====
 # 假设我们有一个模板MFCC（已知的心音特征）
 # 这里我们将假设模板来自前几段信号（例如第一个S1/S2对）
-template_mfcc = mfcc_features[0]
+# template_mfcc = mfcc_features[0]
 
 # 计算测试特征与模板之间的欧氏距离
-distances = [euclidean(feature, template_mfcc) for feature in mfcc_features]
+# distances = [euclidean(feature, template_mfcc) for feature in mfcc_features]
 
 # 基于FSR的加权距离（根据文章的描述）
-fsr_distances = [distance * fsr for distance, fsr in zip(distances, fsr_features)]
+# fsr_distances = [distance * fsr for distance, fsr in zip(distances, fsr_features)]
 
 # ===== 7. 性能评估 =====
 # 在此步骤中，可以根据欧氏距离和FSR加权距离来判断是否属于同一身份
 # 假设你有一个阈值，判断是否为匹配身份
 threshold = 1.5  # 设定一个阈值
 
-
-matches = [dist < threshold for dist in fsr_distances]
+# matches = [dist < threshold for dist in fsr_distances]
 
 # ===== 8. 绘图 =====
 plt.figure(figsize=(15, 8))
@@ -137,7 +142,7 @@ plt.tight_layout()
 plt.show()
 
 # 输出结果
-print("FSR加权距离：", fsr_distances)
-print("匹配结果（True为匹配，False为不匹配）：", matches)
+# print("FSR加权距离：", fsr_distances)
+# print("匹配结果（True为匹配，False为不匹配）：", matches)
 
-sf.write("sub_and_filt.wav",filtered_denoised,sr)
+sf.write("sub_and_filt.wav", filtered_denoised, sr)

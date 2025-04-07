@@ -1,15 +1,40 @@
-import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from scipy.signal import butter
-from torch.utils.data import DataLoader, Dataset
-
 import iSTFT
-import torch.nn.functional as F
-
 import PCG_stage1
 import PCG_stage2
+from torch.utils.data import DataLoader, Dataset
+import numpy as np
+import torch.nn.functional as F
+
+
+class HeartSoundDataset(Dataset):
+    def __init__(self, waveforms, sr=48000, duration=1.0):
+        """
+        waveforms: List[np.array] 心音波形列表
+        sr: 采样率
+        duration: 每个样本的秒数
+        """
+        self.samples = []
+        target_length = int(sr * duration)
+
+        for wave in waveforms:
+            # 标准化长度
+            if len(wave) > target_length:
+                wave = wave[:target_length]
+            else:
+                wave = np.pad(wave, (0, target_length - len(wave)))
+
+            # 标准化幅度
+            wave = wave / (np.max(np.abs(wave)) + 1e-8)
+            self.samples.append(torch.FloatTensor(wave))
+
+    def __len__(self):
+        return len(self.samples)
+
+    def __getitem__(self, idx):
+        return self.samples[idx]
 
 
 class TwoStageModel(nn.Module):
@@ -44,24 +69,7 @@ class PCGLoss(nn.Module):
         self.beta = beta
         self.sr = sr
 
-        # 更鲁棒的低通滤波实现
-        self.register_buffer('lpf_coeff', self._create_lpf_coeff(cutoff=500, order=2))
-
-    def _create_lpf_coeff(self, cutoff, order):
-        nyq = 0.5 * self.sr
-        normal_cutoff = cutoff / nyq
-        sos = butter(order, normal_cutoff, btype='low', output='sos')
-        return torch.from_numpy(sos.astype(np.float32))
-
     def forward(self, pred_wave, target_wave):
-        """
-        Args:
-            pred_wave:   预测波形 [B, T]
-            target_wave: 目标波形 [B, T]
-        Returns:
-            total_loss: 加权总损失
-            loss_dict:  各分项损失详情
-        """
         # 第一阶段：频谱损失计算
         pred_mag, _ = self.stft.transform(pred_wave)[0]  # [B, F, T]
         target_mag, _ = self.stft.transform(target_wave)[0]
@@ -70,58 +78,19 @@ class PCGLoss(nn.Module):
         # 第二阶段：时域损失 + 频谱一致性
         loss_time = F.l1_loss(pred_wave, target_wave)
 
-        # 频谱一致性损失
-        filtered_wave = self.apply_lpf(pred_wave.detach())
-        filtered_mag = self.stft.transform(filtered_wave)[0]
-        loss_consist = F.l1_loss(filtered_mag, pred_mag.detach())
-
-        # 加权总损失（α=10β）
-        total_loss = self.alpha * loss_spec + loss_time + self.beta * loss_consist
-
-        return {
-            'total_loss': total_loss,
-            'loss_spec': loss_spec,
-            'loss_time': loss_time,
-            'loss_spec_consistency': loss_consist,
-            'filtered_wave': filtered_wave  # 返回滤波后的最终输出
-        }
-
-
-class HeartSoundDataset(Dataset):
-    def __init__(self, waveforms, sr=48000, duration=1.0):
-        """
-        waveforms: List[np.array] 心音波形列表
-        sr: 采样率
-        duration: 每个样本的秒数
-        """
-        self.samples = []
-        target_length = int(sr * duration)
-
-        for wave in waveforms:
-            # 标准化长度
-            if len(wave) > target_length:
-                wave = wave[:target_length]
-            else:
-                wave = np.pad(wave, (0, target_length - len(wave)))
-
-            # 标准化幅度
-            wave = wave / (np.max(np.abs(wave)) + 1e-8)
-            self.samples.append(torch.FloatTensor(wave))
-
-    def __len__(self):
-        return len(self.samples)
-
-    def __getitem__(self, idx):
-        return self.samples[idx]
+        # 加权总损失
+        total_loss = self.alpha * loss_spec + loss_time + self.beta * loss_spec
+        return total_loss
 
 
 def main():
     # 设备配置
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    # 数据准备 (示例)
-    train_waves = [np.random.randn(48000) for _ in range(100)]
-    val_waves = [np.random.randn(48000) for _ in range(20)]
+    # 数据准备 (示例，您可以替换为实际的数据)
+    # 使用模拟的心音波形数据作为示例，实际应用时替换为实际的心音数据
+    train_waves = [np.random.randn(48000) for _ in range(100)]  # 100个训练样本
+    val_waves = [np.random.randn(48000) for _ in range(20)]  # 20个验证样本
 
     train_set = HeartSoundDataset(train_waves)
     val_set = HeartSoundDataset(val_waves)
@@ -140,10 +109,10 @@ def main():
         for batch in train_loader:
             batch = batch.to(device)
             pred, _ = model(batch)
-            loss_dict = criterion(pred, batch)
+            loss = criterion(pred, batch)
 
             optimizer.zero_grad()
-            loss_dict['total_loss'].backward()
+            loss.backward()
             optimizer.step()
 
         # 验证
@@ -153,7 +122,7 @@ def main():
             for batch in val_loader:
                 batch = batch.to(device)
                 pred, _ = model(batch)
-                val_loss += criterion(pred, batch)['total_loss'].item()
+                val_loss += criterion(pred, batch).item()
 
         print(f"Epoch {epoch + 1} | Val Loss: {val_loss / len(val_loader):.4f}")
 
