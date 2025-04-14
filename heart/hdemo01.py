@@ -8,7 +8,7 @@ from scipy.spatial.distance import euclidean
 import soundfile as sf
 
 matplotlib.use('TkAgg')
-y, sr = librosa.load("data/output.wav", sr=11025)
+y, sr = librosa.load("data/a0001.wav", sr=11025)
 time = np.arange(len(y)) / sr  # 时间轴（秒）
 
 
@@ -86,7 +86,8 @@ for i, (start, end) in enumerate(s1_s2_segments):
     half_point = len(segment) // 2
     energy_s1 = np.sum(segment[:half_point] ** 2)
     energy_s2 = np.sum(segment[half_point:] ** 2)
-
+    print(energy_s1)
+    print(energy_s2)
     # 计算FSR（S1能量与S2能量的比值）
     fsr = energy_s1 / energy_s2
     fsr_features.append(fsr)
