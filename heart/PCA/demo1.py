@@ -1,6 +1,7 @@
 from sklearn.decomposition import PCA
 import librosa
 import numpy as np
+from scipy.io import wavfile
 
 max_frames = 20000
 min_frames = 5000
@@ -25,11 +26,17 @@ def cut_wav_file(extracted_matrix):
 
 # 加载所有用户数据构建生物特征矩阵，暂时建立三个档案
 all_features = []
+user_gender = [0, 1, 0, 1]  # 存储用户性别,0女1男
+
 wav_files_list = [
     ['..\\data\\xyt\\audio5.wav', '..\\data\\xyt\\audio15.wav', '..\\data\\xyt\\audio25.wav'],
     ['..\\data\\lshenr\\audio5.wav', '..\\data\\lshenr\\audio15.wav', '..\\data\\lshenr\\audio25.wav'],
-    ['..\\data\\lsr\\audio5.wav', '..\\data\\lsr\\audio15.wav', '..\\data\\lsr\\audio25.wav']
+    ['..\\data\\lsr\\audio5.wav', '..\\data\\lsr\\audio15.wav', '..\\data\\lsr\\audio25.wav'],
+    ['..\\data\\lhb\\audio5.wav', '..\\data\\lhb\\audio15.wav', '..\\data\\lhb\\audio25.wav']
 ]
+
+female_list = [wav_files_list[0], wav_files_list[2]]
+male_list = [wav_files_list[1], wav_files_list[3]]
 
 for user_files in wav_files_list:
     user_feats = []
@@ -78,10 +85,10 @@ for user_files in wav_files_list:
     transformed = (user_feats_matrix - mean) @ VT.T[:, selected_indices]
     user_profiles.append(np.mean(transformed, axis=0))
 
-user_ids = ['xyt','lshenr','lsr']
+user_ids = ['xyt', 'lshenr', 'lsr']
 
 # 处理新用户
-new_feat = extract_features_with_mfcc('..\\data\\lhb\\generated_audio15.wav')
+new_feat = extract_features_with_mfcc('..\\data\\xyt\\audio5.wav')
 new_feat = cut_wav_file(new_feat)
 new_transformed = (new_feat - mean) @ VT.T[:, selected_indices]
 new_profile = np.mean(new_transformed, axis=0)
@@ -96,7 +103,8 @@ min_index = distances.index(min_distance)
 
 print(distances)
 print(min_distance)
-
+print(min_index)
+print(user_gender[min_index])
 
 if min(distances) <= threshold:
     print("身份验证通过")
