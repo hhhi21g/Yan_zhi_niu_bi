@@ -64,7 +64,7 @@ def SVD(user_list):
     normalized_variances = (sigma ** 2) / (sigma ** 2).sum()
     sum_first_two = normalized_variances[:2].sum()
     sum_rest = 1.0 - sum_first_two
-    required_sum = sum_rest * 0.8  # 累计剩余方差的90%，选择这些主成分
+    required_sum = sum_rest * 0.9  # 累计剩余方差的90%，选择这些主成分
 
     # 舍弃前两个主成分，从第三个开始选择
     current_sum = 0.0
