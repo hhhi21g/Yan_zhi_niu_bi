@@ -2,8 +2,9 @@ from sklearn.decomposition import PCA
 import librosa
 import numpy as np
 from scipy.io import wavfile
+from sympy import true, false
 
-max_frames = 15000
+max_frames = 10000
 min_frames = 5000
 
 
@@ -24,8 +25,7 @@ def cut_wav_file(extracted_matrix):
     return extracted_matrix
 
 
-# 加载所有用户数据构建生物特征矩阵，暂时建立三个档案
-
+# 加载所有用户数据构建生物特征矩阵，暂时建立四个档案
 user_gender = [0, 1, 0, 1]  # 存储用户性别,0女1男
 
 wav_files_list = [
@@ -39,7 +39,7 @@ female_list = [wav_files_list[0], wav_files_list[2]]
 male_list = [wav_files_list[1], wav_files_list[3]]
 
 
-def SVD(user_list):
+def SVD(user_list, flag):
     all_features = []
     for user_files in user_list:
         user_feats = []
@@ -49,10 +49,8 @@ def SVD(user_list):
             user_feats.append(feat)
         # 合并用户所有音频的特征矩阵
         all_features.append(np.vstack(user_feats))
-
     # 将多个用户的特征矩阵合并为一个生物特征矩阵
     biometric_matrix = np.vstack(all_features)
-
     # 数据中心化
     mean = np.mean(biometric_matrix, axis=0)
     biometric_matrix_centered = biometric_matrix - mean
@@ -69,7 +67,9 @@ def SVD(user_list):
     # 舍弃前两个主成分，从第三个开始选择
     current_sum = 0.0
     selected_indices = []
-    for idx in range(2, len(normalized_variances)):
+    if flag == false: start = 2
+    else: start = 0
+    for idx in range(start, len(normalized_variances)):
         current_sum += normalized_variances[idx]
         selected_indices.append(idx)
         if current_sum >= required_sum:
@@ -77,7 +77,7 @@ def SVD(user_list):
 
     # 构建用户档案
     user_profiles = []
-    for user_files in wav_files_list:
+    for user_files in user_list:
         user_feats = []
         for file in user_files:
             feat = extract_features_with_mfcc(file)
@@ -94,10 +94,11 @@ user_ids = ['xyt', 'lshenr', 'lsr', 'lhb']
 female_ids = ['xyt', 'lsr']
 male_ids = ['lshenr', 'lhb']
 
+flag = false
 # 处理新用户
-new_feat = extract_features_with_mfcc('..\\data\\xyt\\audio25.wav')
+new_feat = extract_features_with_mfcc('..\\data\\lsr\\audio25(6).wav')
 new_feat = cut_wav_file(new_feat)
-mean, VT, selected_indices, user_profiles = SVD(wav_files_list)
+mean, VT, selected_indices, user_profiles = SVD(wav_files_list, flag)
 new_transformed = (new_feat - mean) @ VT.T[:, selected_indices]
 new_profile = np.mean(new_transformed, axis=0)
 
@@ -115,8 +116,9 @@ print(min_index)
 print(user_gender[min_index])
 print("************************************************************************")
 
+flag = true
 if user_gender[min_index] == 0:  # 女
-    mean_0, VT_0, selected_indices_0, user_profiles_0 = SVD(female_list)
+    mean_0, VT_0, selected_indices_0, user_profiles_0 = SVD(female_list, flag)
     new_female_transformed = (new_feat - mean_0) @ VT_0.T[:, selected_indices_0]
     new_female_profile = np.mean(new_female_transformed, axis=0)
     distances_0 = [np.linalg.norm(up - new_female_profile) for up in user_profiles_0]
@@ -125,7 +127,7 @@ if user_gender[min_index] == 0:  # 女
     new_min_index = distances_0.index(new_min_distance)
 
 if user_gender[min_index] == 1:  # 男
-    mean_1, VT_1, selected_indices_1, user_profiles_1 = SVD(male_list)
+    mean_1, VT_1, selected_indices_1, user_profiles_1 = SVD(male_list, flag)
     new_male_transformed = (new_feat - mean_1) @ VT_1.T[:, selected_indices_1]
     new_male_profile = np.mean(new_male_transformed, axis=0)
     distances_1 = [np.linalg.norm(up - new_male_profile) for up in user_profiles_1]
