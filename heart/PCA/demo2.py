@@ -4,8 +4,8 @@ import numpy as np
 from scipy.io import wavfile
 from sympy import true, false
 
-max_frames = 10000
-min_frames = 5000
+max_frames = 5000
+min_frames = 2500
 
 
 def extract_features_with_mfcc(wav_file, n_mfcc=15, hop_length=64):
@@ -96,55 +96,60 @@ user_ids = ['xyt', 'lshenr', 'lsr', 'lhb']
 female_ids = ['xyt', 'lsr']
 male_ids = ['lshenr', 'lhb']
 
+new_list = ['..\\data\\lsr\\audio25(1).wav', '..\\data\\lsr\\audio25(2).wav', '..\\data\\lsr\\audio25(3).wav',
+            '..\\data\\lsr\\audio25(4).wav', '..\\data\\lsr\\audio25(5).wav', '..\\data\\lsr\\audio25(6).wav',
+            '..\\data\\lsr\\night1.wav', '..\\data\\lsr\\night2.wav', '..\\data\\lsr\\night3.wav',
+            '..\\data\\lsr\\night4.wav', '..\\data\\lsr\\night5.wav', '..\\data\\lsr\\night6.wav']
 flag = false
 # 处理新用户
-new_feat = extract_features_with_mfcc('..\\data\\lsr\\night5.wav')
-new_feat = cut_wav_file(new_feat)
-mean, VT, selected_indices, user_profiles = SVD(wav_files_list, flag)
-new_transformed = (new_feat - mean) @ VT.T[:, selected_indices]
-new_profile = np.mean(new_transformed, axis=0)
+for new_file in new_list:
+    new_feat = extract_features_with_mfcc(new_file)
+    new_feat = cut_wav_file(new_feat)
+    mean, VT, selected_indices, user_profiles = SVD(wav_files_list, flag)
+    new_transformed = (new_feat - mean) @ VT.T[:, selected_indices]
+    new_profile = np.mean(new_transformed, axis=0)
 
-# 计算欧几里得距离
-distances = [np.linalg.norm(up - new_profile) for up in user_profiles]
-threshold = 1.78  # 需要根据实际数据校准
+    # 计算欧几里得距离
+    distances = [np.linalg.norm(up - new_profile) for up in user_profiles]
+    threshold = 1.78  # 需要根据实际数据校准
 
-# 找到最小距离和对应的用户索引
-min_distance = min(distances)
-min_index = distances.index(min_distance)
+    # 找到最小距离和对应的用户索引
+    min_distance = min(distances)
+    min_index = distances.index(min_distance)
 
-print(distances)
-print(min_distance)
-print(min_index)
-print(user_gender[min_index])
-print("************************************************************************")
+    print(distances)
+    print(min_distance)
+    print(min_index)
+    print(user_gender[min_index])
+    print("************************************************************************")
 
-flag = true
-if user_gender[min_index] == 0:  # 女
-    mean_0, VT_0, selected_indices_0, user_profiles_0 = SVD(female_list, flag)
-    new_female_transformed = (new_feat - mean_0) @ VT_0.T[:, selected_indices_0]
-    new_female_profile = np.mean(new_female_transformed, axis=0)
-    distances_0 = [np.linalg.norm(up - new_female_profile) for up in user_profiles_0]
-    new_min_distance = min(distances_0)
-    print(distances_0)
-    new_min_index = distances_0.index(new_min_distance)
+    flag = true
+    if user_gender[min_index] == 0:  # 女
+        mean_0, VT_0, selected_indices_0, user_profiles_0 = SVD(female_list, flag)
+        new_female_transformed = (new_feat - mean_0) @ VT_0.T[:, selected_indices_0]
+        new_female_profile = np.mean(new_female_transformed, axis=0)
+        distances_0 = [np.linalg.norm(up - new_female_profile) for up in user_profiles_0]
+        new_min_distance = min(distances_0)
+        print(distances_0)
+        new_min_index = distances_0.index(new_min_distance)
 
-if user_gender[min_index] == 1:  # 男
-    mean_1, VT_1, selected_indices_1, user_profiles_1 = SVD(male_list, flag)
-    new_male_transformed = (new_feat - mean_1) @ VT_1.T[:, selected_indices_1]
-    new_male_profile = np.mean(new_male_transformed, axis=0)
-    distances_1 = [np.linalg.norm(up - new_male_profile) for up in user_profiles_1]
-    print(distances_1)
-    new_min_distance = min(distances_1)
-    new_min_index = distances_1.index(new_min_distance)
+    if user_gender[min_index] == 1:  # 男
+        mean_1, VT_1, selected_indices_1, user_profiles_1 = SVD(male_list, flag)
+        new_male_transformed = (new_feat - mean_1) @ VT_1.T[:, selected_indices_1]
+        new_male_profile = np.mean(new_male_transformed, axis=0)
+        distances_1 = [np.linalg.norm(up - new_male_profile) for up in user_profiles_1]
+        print(distances_1)
+        new_min_distance = min(distances_1)
+        new_min_index = distances_1.index(new_min_distance)
 
-print(new_min_distance)
-print(new_min_index)
+    print(new_min_distance)
+    print(new_min_index)
 
-if new_min_index <= threshold:
-    print("身份验证通过")
-    if user_gender[min_index] == 0:
-        print(female_ids[new_min_index])
+    if new_min_index <= threshold:
+        print("身份验证通过")
+        if user_gender[min_index] == 0:
+            print(female_ids[new_min_index])
+        else:
+            print(male_ids[new_min_index])
     else:
-        print(male_ids[new_min_index])
-else:
-    print("身份验证失败")
+        print("身份验证失败")
