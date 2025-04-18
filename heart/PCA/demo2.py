@@ -10,7 +10,7 @@ min_frames = 5000
 
 def extract_features_with_mfcc(wav_file, n_mfcc=15, hop_length=64):
     y, sr = librosa.load(wav_file, sr=None)
-
+    # print(sr)
     # 提取MFCC特征
     mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=n_mfcc, hop_length=hop_length)
 
@@ -67,8 +67,10 @@ def SVD(user_list, flag):
     # 舍弃前两个主成分，从第三个开始选择
     current_sum = 0.0
     selected_indices = []
-    if flag == false: start = 2
-    else: start = 0
+    if flag == false:
+        start = 2
+    else:
+        start = 0
     for idx in range(start, len(normalized_variances)):
         current_sum += normalized_variances[idx]
         selected_indices.append(idx)
@@ -96,7 +98,7 @@ male_ids = ['lshenr', 'lhb']
 
 flag = false
 # 处理新用户
-new_feat = extract_features_with_mfcc('..\\data\\lsr\\audio25(6).wav')
+new_feat = extract_features_with_mfcc('..\\data\\lsr\\night5.wav')
 new_feat = cut_wav_file(new_feat)
 mean, VT, selected_indices, user_profiles = SVD(wav_files_list, flag)
 new_transformed = (new_feat - mean) @ VT.T[:, selected_indices]
