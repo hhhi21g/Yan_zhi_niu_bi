@@ -29,10 +29,28 @@ all_features = []
 user_gender = [0, 1, 0, 1]  # 存储用户性别,0女1男
 
 wav_files_list = [
-    ['..\\data\\xyt\\audio5.wav', '..\\data\\xyt\\audio15.wav', '..\\data\\xyt\\audio25.wav'],
-    ['..\\data\\lshenr\\audio5.wav', '..\\data\\lshenr\\audio15.wav', '..\\data\\lshenr\\audio25.wav'],
-    ['..\\data\\lsr\\audio5.wav', '..\\data\\lsr\\audio15.wav', '..\\data\\lsr\\audio25.wav'],
-    ['..\\data\\lhb\\audio5.wav', '..\\data\\lhb\\audio15.wav', '..\\data\\lhb\\audio25.wav']
+    [
+        '..\\data\\xyt\\record_generate1_25.wav', '..\\data\\xyt\\record_generate2_25.wav',
+        '..\\data\\xyt\\record_generate3_25.wav', '..\\data\\xyt\\record_generate4_25.wav',
+        '..\\data\\xyt\\record_generate5_25.wav', '..\\data\\xyt\\record_generate6_25.wav',
+        '..\\data\\xyt\\record_generate7_25.wav', '..\\data\\xyt\\record_generate8_25.wav'
+    ],
+    [
+        '..\\data\\lshenr\\record_generate1_25.wav', '..\\data\\lshenr\\record_generate2_25.wav',
+        '..\\data\\lshenr\\record_generate3_25.wav', '..\\data\\lshenr\\record_generate4_25.wav',
+        '..\\data\\lshenr\\record_generate5_25.wav', '..\\data\\lshenr\\record_generate6_25.wav',
+        '..\\data\\lshenr\\record_generate7_25.wav'
+    ],
+    [
+        '..\\data\\lsr\\audio25(1).wav', '..\\data\\lsr\\audio25(2).wav', '..\\data\\lsr\\audio25(3).wav',
+        '..\\data\\lsr\\audio25(4).wav', '..\\data\\lsr\\audio25(5).wav', '..\\data\\lsr\\audio25(6).wav'
+    ],
+    [
+        '..\\data\\lhb\\record_generate1_25.wav', '..\\data\\lhb\\record_generate2_25.wav',
+        '..\\data\\lhb\\record_generate3_25.wav', '..\\data\\lhb\\record_generate4_25.wav',
+        '..\\data\\lhb\\record_generate5_25.wav', '..\\data\\lhb\\record_generate6_25.wav',
+        '..\\data\\lhb\\record_generate7_25.wav', '..\\data\\lhb\\record_generate8_25.wav',
+    ]
 ]
 
 female_list = [wav_files_list[0], wav_files_list[2]]
@@ -87,24 +105,31 @@ for user_files in wav_files_list:
 
 user_ids = ['xyt', 'lshenr', 'lsr']
 
+new_list = ['..\\data\\survey1\\record_generate2_25.wav', '..\\data\\survey2\\record_generate2_25.wav',
+            '..\\data\\survey3\\record_generate2_25.wav', '..\\data\\survey4\\record_generate2_25.wav',
+            '..\\data\\survey5\\record_generate2_25.wav']
+flag = false
 # 处理新用户
-new_feat = extract_features_with_mfcc('..\\data\\xyt\\audio5.wav')
-new_feat = cut_wav_file(new_feat)
-new_transformed = (new_feat - mean) @ VT.T[:, selected_indices]
-new_profile = np.mean(new_transformed, axis=0)
+for new_file in new_list:
+    new_feat = extract_features_with_mfcc(new_file)
+    new_feat = cut_wav_file(new_feat)
+    mean, VT, selected_indices, user_profiles = SVD(wav_files_list, flag)
+    new_transformed = (new_feat - mean) @ VT.T[:, selected_indices]
+    new_profile = np.mean(new_transformed, axis=0)
 
-# 计算欧几里得距离
-distances = [np.linalg.norm(up - new_profile) for up in user_profiles]
-threshold = 1.78  # 需要根据实际数据校准
+    # 计算欧几里得距离
+    distances = [np.linalg.norm(up - new_profile) for up in user_profiles]
+    threshold = 1.78  # 需要根据实际数据校准
 
-# 找到最小距离和对应的用户索引
-min_distance = min(distances)
-min_index = distances.index(min_distance)
+    # 找到最小距离和对应的用户索引
+    min_distance = min(distances)
+    min_index = distances.index(min_distance)
 
-print(distances)
-print(min_distance)
-print(min_index)
-print(user_gender[min_index])
+    print(distances)
+    print(min_distance)
+    print(min_index)
+    print(user_gender[min_index])
+    print("************************************************************************")
 
 if min(distances) <= threshold:
     print("身份验证通过")

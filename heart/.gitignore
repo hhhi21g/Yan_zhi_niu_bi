@@ -1,6 +1,7 @@
-data/suvey1/
+data/survey1/
 wav2vec2-base-960/
-wav2vec2/
+
 dataSet/
 data/
 
+!/wav2vec2/

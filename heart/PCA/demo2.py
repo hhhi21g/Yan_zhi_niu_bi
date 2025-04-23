@@ -29,10 +29,28 @@ def cut_wav_file(extracted_matrix):
 user_gender = [0, 1, 0, 1]  # 存储用户性别,0女1男
 
 wav_files_list = [
-    ['..\\data\\xyt\\audio5.wav', '..\\data\\xyt\\audio15.wav', '..\\data\\xyt\\audio25.wav'],
-    ['..\\data\\lshenr\\audio5.wav', '..\\data\\lshenr\\audio15.wav', '..\\data\\lshenr\\audio25.wav'],
-    ['..\\data\\lsr\\audio5.wav', '..\\data\\lsr\\audio15.wav', '..\\data\\lsr\\audio25.wav'],
-    ['..\\data\\lhb\\audio5.wav', '..\\data\\lhb\\audio10.wav', '..\\data\\lhb\\audio15.wav']
+    [
+        '..\\data\\xyt\\record_generate1_25.wav', '..\\data\\xyt\\record_generate2_25.wav',
+        '..\\data\\xyt\\record_generate3_25.wav', '..\\data\\xyt\\record_generate4_25.wav',
+        '..\\data\\xyt\\record_generate5_25.wav', '..\\data\\xyt\\record_generate6_25.wav',
+        '..\\data\\xyt\\record_generate7_25.wav', '..\\data\\xyt\\record_generate8_25.wav'
+    ],
+    [
+        '..\\data\\lshenr\\record_generate1_25.wav', '..\\data\\lshenr\\record_generate2_25.wav',
+        '..\\data\\lshenr\\record_generate3_25.wav', '..\\data\\lshenr\\record_generate4_25.wav',
+        '..\\data\\lshenr\\record_generate5_25.wav', '..\\data\\lshenr\\record_generate6_25.wav',
+        '..\\data\\lshenr\\record_generate7_25.wav'
+    ],
+    [
+        '..\\data\\lsr\\audio25(1).wav', '..\\data\\lsr\\audio25(2).wav', '..\\data\\lsr\\audio25(3).wav',
+        '..\\data\\lsr\\audio25(4).wav', '..\\data\\lsr\\audio25(5).wav', '..\\data\\lsr\\audio25(6).wav'
+    ],
+    [
+        '..\\data\\lhb\\record_generate1_25.wav', '..\\data\\lhb\\record_generate2_25.wav',
+        '..\\data\\lhb\\record_generate3_25.wav', '..\\data\\lhb\\record_generate4_25.wav',
+        '..\\data\\lhb\\record_generate5_25.wav', '..\\data\\lhb\\record_generate6_25.wav',
+        '..\\data\\lhb\\record_generate7_25.wav', '..\\data\\lhb\\record_generate8_25.wav',
+    ]
 ]
 
 female_list = [wav_files_list[0], wav_files_list[2]]
@@ -62,13 +80,13 @@ def SVD(user_list, flag):
     normalized_variances = (sigma ** 2) / (sigma ** 2).sum()
     sum_first_two = normalized_variances[:2].sum()
     sum_rest = 1.0 - sum_first_two
-    required_sum = sum_rest * 0.9  # 累计剩余方差的90%，选择这些主成分
+    required_sum = sum_rest * 0.8  # 累计剩余方差的90%，选择这些主成分
 
     # 舍弃前两个主成分，从第三个开始选择
     current_sum = 0.0
     selected_indices = []
     if flag == false:
-        start = 2
+        start = 3
     else:
         start = 0
     for idx in range(start, len(normalized_variances)):
@@ -96,10 +114,9 @@ user_ids = ['xyt', 'lshenr', 'lsr', 'lhb']
 female_ids = ['xyt', 'lsr']
 male_ids = ['lshenr', 'lhb']
 
-new_list = ['..\\data\\lsr\\audio25(1).wav', '..\\data\\lsr\\audio25(2).wav', '..\\data\\lsr\\audio25(3).wav',
-            '..\\data\\lsr\\audio25(4).wav', '..\\data\\lsr\\audio25(5).wav', '..\\data\\lsr\\audio25(6).wav',
-            '..\\data\\lsr\\night1.wav', '..\\data\\lsr\\night2.wav', '..\\data\\lsr\\night3.wav',
-            '..\\data\\lsr\\night4.wav', '..\\data\\lsr\\night5.wav', '..\\data\\lsr\\night6.wav']
+new_list = ['..\\data\\survey1\\record_generate2_25.wav', '..\\data\\survey2\\record_generate2_25.wav',
+            '..\\data\\survey3\\record_generate2_25.wav', '..\\data\\survey4\\record_generate2_25.wav',
+            '..\\data\\survey5\\record_generate2_25.wav']
 flag = false
 # 处理新用户
 for new_file in new_list:
