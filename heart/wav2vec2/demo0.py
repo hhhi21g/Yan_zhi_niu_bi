@@ -7,7 +7,7 @@ from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
 from transformers import Wav2Vec2ForSequenceClassification
 from sklearn.model_selection import KFold
 
-kFold = KFold(n_splits=10, shuffle=True, random_state=42)
+kFold = KFold(n_splits=6, shuffle=True, random_state=42)
 
 model_name = 'E:\\Xinan\\XinAnBei\\heart\\wav2vec2-base-960'
 
@@ -99,7 +99,7 @@ for fold, (train_idx, val_idx) in enumerate(kFold.split(dataset)):
 
     # 定义优化器
     optimizer = torch.optim.AdamW(model.parameters(), lr=2e-5)
-    scheduler = StepLR(optimizer,step_size=5,gamma=0.1)
+    scheduler = StepLR(optimizer, step_size=5, gamma=0.1)
 
     # 训练循环
     num_epochs = 100
