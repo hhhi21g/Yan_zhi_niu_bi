@@ -2,7 +2,6 @@ import librosa
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import ScalarFormatter
-from scipy.io import wavfile
 from scipy.signal import butter, filtfilt
 from sklearn.decomposition import FastICA
 import soundfile as sf
@@ -85,7 +84,7 @@ def main():
     cutoff_frequencies = {25, 15, 5}
 
     for reference_frequency in reference_frequencies:
-        file_path = "data\\dataSet\\a0001.wav"
+        file_path = "dataSet\\a0001.wav"
         for cutoff_frequency in cutoff_frequencies:
             plot_title = f'reference_frequency = {reference_frequency}, cutoff_frequency = {cutoff_frequency}'
             heart_signal, x, sample_rate = echo(file_path, reference_frequency, cutoff_frequency, plot_title)
