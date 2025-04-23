@@ -83,7 +83,7 @@ def echo(file_path, cutoff_frequency, plot_title):
 def main():
     cutoff_frequencies = {25, 15, 5}
 
-    file_path = "data\\dataSet\\a0001.wav"
+    file_path = "dataSet\\a0001.wav"
     for cutoff_frequency in cutoff_frequencies:
         plot_title = f'cutoff_frequency = {cutoff_frequency}'
         heart_signal, x, sample_rate = echo(file_path, cutoff_frequency, plot_title)
