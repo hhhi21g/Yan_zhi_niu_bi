@@ -48,27 +48,10 @@ def get_all_data(audio_dir):
 
 
 class HeartSoundDataset(Dataset):
-    def __init__(self, audio_files, transform=None, test_size=1 / 6, is_test=False):
+    def __init__(self, audio_files, transform=None, is_test=False):
         self.audio_files = audio_files
         self.transform = transform
-        # self.test_size = test_size
-        # self.audio_files = []
         self.is_test = is_test
-        # category_folders = sorted(os.listdir(audio_dir))
-        #
-        # for label, user_folder in enumerate(category_folders):
-        #     user_folder_path = os.path.join(audio_dir, user_folder)
-        #     if os.path.isdir(user_folder_path):
-        #         wav_files = [f for f in os.listdir(user_folder_path) if f.endswith(".wav")]
-        #         wav_files.sort()
-        #         train_files, test_files = train_test_split(wav_files, test_size=self.test_size, random_state=42)
-        #
-        #         if self.is_test:
-        #             for file in test_files:
-        #                 self.audio_files.append((os.path.join(user_folder_path, file), label))
-        #         else:
-        #             for file in train_files:
-        #                 self.audio_files.append((os.path.join(user_folder_path, file), label))
 
     def __len__(self):
         return len(self.audio_files)
@@ -102,7 +85,7 @@ criterion = torch.nn.CrossEntropyLoss()
 
 # 初始化学习率调度器
 # lr_scheduler = ReduceLROnPlateau(optimizer, 'min', patience=3, factor=0.5, verbose=True)
-lr_scheduler = StepLR(optimizer, step_size=5, gamma=0.2)
+lr_scheduler = StepLR(optimizer, step_size=5, gamma=0.5)
 
 
 # 早停回调
@@ -201,7 +184,7 @@ def test_model(test_dataloader, model, device):
 
 
 # 获取测试集
-def get_test_data(audio_dir, transform=None):
+def get_test_data(transform=None):
     # 通过 is_test=True 只加载测试集
     test_dataset = HeartSoundDataset(test_data, transform=transform, is_test=True)
     test_dataloader = DataLoader(test_dataset, batch_size=2, shuffle=False)
@@ -240,7 +223,7 @@ def cross_validation(train_data, test_data, n_splits=5, epochs=70, patience=7):
 
         # lr_scheduler = ReduceLROnPlateau(optimizer, 'min', patience=3, factor=0.5, verbose=True)
 
-        lr_scheduler = StepLR(optimizer, step_size=5, gamma=0.2)
+        lr_scheduler = StepLR(optimizer, step_size=5, gamma=0.5)
 
         # 训练模型
         train(model, train_dataloader, val_dataloader, optimizer, criterion, lr_scheduler, epochs, patience)
@@ -282,19 +265,3 @@ cross_validation(train_data, test_data, n_splits=5, epochs=70, patience=7)
 
 # 保存模型
 torch.save(model.state_dict(), "EfficientNet_model.pth")
-
-# test_dataloader = DataLoader(test_dataset, batch_size=2, shuffle=False)
-
-#
-# # 加载测试图像并进行推理
-# model = EfficientNetForImageClassification.from_pretrained('E:\\Xinan\\XinAnBei\\heart\\EfficientNet')
-# model.load_state_dict(torch.load("EfficientNet_model.pth"))
-# model.to(device)
-#
-# # 推理
-# correct = 0
-# total = 0
-#
-# # 进行测试
-# accuracy = test_model(test_dataloader, model, device)
-# print(f'Final Accuracy on the test set: {accuracy:.2f}%')
