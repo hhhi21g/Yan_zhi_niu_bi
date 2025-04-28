@@ -6,7 +6,6 @@ data/
 
 wav2vec2/
 EfficientNet/
-<<<<<<< Updated upstream
-=======
+
+
 EfficientNetCode/EfficientNet_model.pth
->>>>>>> Stashed changes
