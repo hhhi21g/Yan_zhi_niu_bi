@@ -4,4 +4,5 @@ wav2vec2-base-960/
 dataSet/
 data/
 
-!/wav2vec2/
+wav2vec2/
+EfficientNet/
