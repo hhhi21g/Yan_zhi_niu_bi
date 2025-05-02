@@ -192,7 +192,7 @@ def get_test_data(transform=None):
 
 
 # 加载测试数据集
-test_dataloader = get_test_data(audio_dir=audio_dir, transform=transform)
+test_dataloader = get_test_data( transform=transform)
 
 
 # K折交叉验证
@@ -211,7 +211,7 @@ def cross_validation(train_data, test_data, n_splits=5, epochs=70, patience=7):
         train_dataset = HeartSoundDataset(train_fold, transform=transform, is_test=False)
         val_dataset = HeartSoundDataset(val_fold, transform=transform, is_test=False)
 
-        train_dataloader = DataLoader(train_dataset, batch_size=64, shuffle=True)
+        train_dataloader = DataLoader(train_dataset, batch_size=128, shuffle=True)
         val_dataloader = DataLoader(val_dataset, batch_size=32, shuffle=False)
 
         # 初始化模型、优化器等

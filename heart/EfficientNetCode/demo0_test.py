@@ -44,7 +44,7 @@ model.eval()
 
 correct = 0
 total = 0
-
+torch.optim.SGD
 # 加载测试数据集
 test_dataset = get_test_data(audio_dir=audio_dir, transform=transform)
 test_dataloader = DataLoader(test_dataset, batch_size=2, shuffle=False)
