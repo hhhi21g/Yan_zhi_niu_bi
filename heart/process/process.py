@@ -100,12 +100,12 @@ def ica_proc(reference_frequency, cutoff_frequency, file_path):
 
 def main():
     reference_frequencies = 21000
-    file_path = "..\\data\\survey1\\record_generate1_25.wav"
+    file_path = "..\\data\\lsr\\audio5.wav"
 
     # 利用5Hz图像找出最低处作为分割点
     sample_rate, S_estimated_5Hz = ica_proc(reference_frequencies, cutoff_frequency=5, file_path=file_path)
 
-    window = 0.2
+    window = 0.55
 
     for i in range(S_estimated_5Hz.shape[1]):
         split_point = []
