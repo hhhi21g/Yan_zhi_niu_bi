@@ -9,3 +9,5 @@ EfficientNet/
 
 
 EfficientNetCode/EfficientNet_model.pth
+dataSet_original/
+dataSet_wav_1epoch/

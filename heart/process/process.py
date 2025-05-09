@@ -8,6 +8,7 @@ from scipy.signal import butter, filtfilt
 from sklearn.decomposition import FastICA
 import soundfile as sf
 from scipy.spatial.distance import euclidean
+import os
 import math
 
 
@@ -47,8 +48,8 @@ def extract_heart_signal(received_signal, reference_frequency, sample_rate, cuto
 
 
 def echo(file_path, reference_frequency, cutoff_frequency, plot_title):
-    start_time = 4  # 起始时间，单位秒
-    end_time = 9  # 结束时间，单位秒
+    start_time = 3  # 起始时间，单位秒
+    end_time = 10  # 结束时间，单位秒
 
     sample_rate, received_signal = read_m4a_and_clip(file_path, start_time, end_time)
     '''
@@ -99,8 +100,12 @@ def ica_proc(reference_frequency, cutoff_frequency, file_path):
 
 
 def main():
+
     reference_frequencies = 21000
-    file_path = "..\\data\\lsr\\audio5.wav"
+    file_path = "..\\dataSet_original\\lsr\\record2.m4a"
+
+    save_dir = "..\\dataSet_pic_1epoch\\lsr"
+    os.makedirs(save_dir, exist_ok=True)
 
     # 利用5Hz图像找出最低处作为分割点
     sample_rate, S_estimated_5Hz = ica_proc(reference_frequencies, cutoff_frequency=5, file_path=file_path)
@@ -147,16 +152,29 @@ def main():
         if (end / sample_rate - start / sample_rate) < window:
             continue
 
-        # 绘制波形
-        ax.plot(time_axis, sample_audio, color='blue', linewidth=0.8)
+            # 创建单独的图像
+        plt.figure(figsize=(10, 2.5))
+        plt.plot(time_axis, sample_audio, color='blue', linewidth=0.8)
+        plt.xlabel("Time (s)")
+        plt.ylabel("Amplitude")
+        plt.title(f"Segment {j - 1}: {start / sample_rate:.2f}s to {end / sample_rate:.2f}s")
+        plt.tight_layout()
 
-        # 设置标签和标题
-        ax.set_xlabel("Time (s)")
-        ax.set_ylabel("Amplitude")
-        ax.set_title(f"Segment {ax_idx + 1}: {start / sample_rate:.2f}s to {end / sample_rate:.2f}s")
-
-    plt.tight_layout()
-    plt.show()
+        # 保存图像
+        save_path = os.path.join(save_dir, f"segment_{j - 1}.png")
+        plt.savefig(save_path)
+        plt.close()  # 关闭当前图，避免内存累积
+        print(f"✅ 保存: {save_path}")
+    #     # 绘制波形
+    #     ax.plot(time_axis, sample_audio, color='blue', linewidth=0.8)
+    #
+    #     # 设置标签和标题
+    #     ax.set_xlabel("Time (s)")
+    #     ax.set_ylabel("Amplitude")
+    #     ax.set_title(f"Segment {ax_idx + 1}: {start / sample_rate:.2f}s to {end / sample_rate:.2f}s")
+    #
+    # plt.tight_layout()
+    # plt.show()
 
     """x = np.arange(split_point[0], split_point[-1])
     ax[-1].plot(x, S_estimated_25Hz)
