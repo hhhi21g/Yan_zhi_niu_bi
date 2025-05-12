@@ -2,6 +2,7 @@ from sklearn.decomposition import PCA
 import librosa
 import numpy as np
 from scipy.io import wavfile
+from sklearn.svm import SVC
 from sympy import false
 import os
 from sklearn.neighbors import KNeighborsClassifier
@@ -9,11 +10,11 @@ from collections import Counter
 from sklearn.preprocessing import StandardScaler
 
 
-def extract_features_with_mfcc(wav_file, n_mfcc=13, hop_length=512):
+def extract_features_with_mfcc(wav_file, n_mfcc=15, hop_length=480,n_fft=2048):
     y, sr = librosa.load(wav_file, sr=None)
 
     # 提取MFCC特征
-    mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=n_mfcc, hop_length=hop_length)
+    mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=n_mfcc, hop_length=hop_length,n_fft=n_fft)
 
     # 返回MFCC特征矩阵，即音频信号的一个低纬度特征向量
     return mfcc.T  # (时间帧数, 特征维度)
@@ -61,12 +62,11 @@ def SVD(user_list, flag):
     normalized_variances = (sigma ** 2) / (sigma ** 2).sum()
     sum_first_two = normalized_variances[:2].sum()
     sum_rest = 1.0 - sum_first_two
-    required_sum = sum_rest * 0.8  # 累计剩余方差的90%，选择这些主成分
+    required_sum = sum_rest * 0.9  # 累计剩余方差的90%，选择这些主成分
 
-    # 舍弃前两个主成分，从第三个开始选择
     current_sum = 0.0
     selected_indices = []
-    start = 2
+    start = 1
     # if flag == false:
     #     start = 3
     # else:
@@ -92,7 +92,6 @@ def SVD(user_list, flag):
     return mean, VT, selected_indices, user_profiles
 
 
-# 加载所有用户数据构建生物特征矩阵，暂时建立三个档案
 all_features = []
 
 dataset_path = "../dataSet_wav_1epoch"
@@ -153,6 +152,7 @@ y_train = np.array(y_train)
 
 knn = KNeighborsClassifier(n_neighbors=7)
 knn.fit(X_train, y_train)
+
 
 new_list, new_user_id = load_wav_files_from_dataset("../testSet_wav_1epoch")
 flag = False

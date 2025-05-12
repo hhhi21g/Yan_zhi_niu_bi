@@ -134,14 +134,14 @@ def main():
     n_segments = len(split_point) - 2  # 例如 split_point有7个点，则有效分段数为5
     fig, axes = plt.subplots(n_segments, 1, figsize=(12, 2 * n_segments))
 
-    for j in range(2, len(split_point)):  # 从 j=2 开始处理有效分段
+    for j in range(2, len(split_point)-1):  # 从 j=2 开始处理有效分段
         # 当前子图索引
         ax_idx = j - 2
         ax = axes[ax_idx]
 
         # 提取分段区间
         start = split_point[j - 1].item()
-        end = split_point[j].item()
+        end = split_point[j+1].item()
 
         # 提取分段数据
         sample_audio = audio[start:end]  # 直接使用张量切片

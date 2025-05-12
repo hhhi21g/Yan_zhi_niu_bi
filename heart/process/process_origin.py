@@ -98,7 +98,7 @@ def ica_proc(reference_frequency, cutoff_frequency, file_path):
     print("估计的混合矩阵:\n", A_estimated)
     return sample_rate, S_estimated
 
-cnt = 0
+cnt = 2
 def process_file(file_path, output_folder, reference_frequencies=21000, window=0.6):
     global cnt
     file_name = os.path.splitext(os.path.basename(file_path))[0]
@@ -126,9 +126,10 @@ def process_file(file_path, output_folder, reference_frequencies=21000, window=0
     output_subfolder = os.path.join(output_folder, file_name)
     os.makedirs(output_folder, exist_ok=True)
 
-    for j in range(2, len(split_point)):
+    # for j in range(2, len(split_point)-1):
+    for j in range(2, len(split_point) - 1, 2):
         start = split_point[j - 1]
-        end = split_point[j]
+        end = split_point[j+1]
 
         if (end - start) / sample_rate < window:
             continue
@@ -143,9 +144,10 @@ def process_file(file_path, output_folder, reference_frequencies=21000, window=0
 
 
 
+
 def main():
-    input_folder = "..\\dataSet_original"  # 输入 .m4a 文件夹
-    output_folder = "..\\dataSet_wav_1epoch\\lsr"  # 输出 .wav 分段文件夹
+    input_folder = "..\\dataSet_original\\xyt"  # 输入 .m4a 文件夹
+    output_folder = "..\\dataSet_wav_2epoch\\xyt"  # 输出 .wav 分段文件夹
 
     for file in os.listdir(input_folder):
         if file.endswith(".m4a"):
