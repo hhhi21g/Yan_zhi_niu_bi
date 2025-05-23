@@ -36,9 +36,9 @@ def extract_lfbc_features(signal, sr, n_ceps=N_CEPS):
 
 # ========== 待识别的测试音频路径 ==========
 test_files = [
-    "..\\data\\xyt\\audio25.wav",
-    "..\\data\\lshenr\\audio25.wav",
-    "..\\data\\lsr\\audio25.wav"
+    "..\\data\\3\\audio25.wav",
+    "..\\data\\1\\audio25.wav",
+    "..\\data\\2\\audio25.wav"
 ]
 
 # ========== 加载模型 ==========

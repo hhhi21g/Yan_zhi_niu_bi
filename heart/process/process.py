@@ -104,7 +104,7 @@ def main():
     reference_frequencies = 21000
     file_path = "..\\dataSet_original\\lsr\\record2.m4a"
 
-    save_dir = "..\\dataSet_pic_1epoch\\lsr"
+    save_dir = "..\\dataSet_pic_1epoch\\2"
     os.makedirs(save_dir, exist_ok=True)
 
     # 利用5Hz图像找出最低处作为分割点

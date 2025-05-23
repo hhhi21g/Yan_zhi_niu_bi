@@ -146,8 +146,8 @@ def process_file(file_path, output_folder, reference_frequencies=21000, window=0
 
 
 def main():
-    input_folder = "..\\dataSet_original\\xyt"  # 输入 .m4a 文件夹
-    output_folder = "..\\dataSet_wav_2epoch\\xyt"  # 输出 .wav 分段文件夹
+    input_folder = "..\\dataSet_original\\3"  # 输入 .m4a 文件夹
+    output_folder = "..\\dataSet_wav_2epoch\\3"  # 输出 .wav 分段文件夹
 
     for file in os.listdir(input_folder):
         if file.endswith(".m4a"):
@@ -156,7 +156,7 @@ def main():
 
 
 reference_frequencies = 21000
-# file_path = f"..\\dataSet_original\\xyt\\record1.m4a"
+# file_path = f"..\\dataSet_original\\3\\record1.m4a"
 #
 # # 利用5Hz图像找出最低处作为分割点
 # sample_rate, S_estimated_5Hz = ica_proc(reference_frequencies, cutoff_frequency=5, file_path=file_path)
@@ -181,7 +181,7 @@ reference_frequencies = 21000
 # sample_rate, S_estimated_25Hz = ica_proc(reference_frequencies, cutoff_frequency=25, file_path=file_path)
 #
 # audio = S_estimated_25Hz[:, 0]
-# output_folder = "..\\dataSet_wav_1epoch\\xyt"
+# output_folder = "..\\dataSet_wav_1epoch\\3"
 # os.makedirs(output_folder, exist_ok=True)
 #
 # # 计算需要显示的分段数量（split_point中 j >=2 的有效分段数）

@@ -33,26 +33,26 @@ user_gender = [0, 1, 0, 1]  # 存储用户性别,0女1男
 
 wav_files_list = [
     [
-        '..\\data\\xyt\\record_generate1_25.wav', '..\\data\\xyt\\record_generate2_25.wav',
-        '..\\data\\xyt\\record_generate3_25.wav', '..\\data\\xyt\\record_generate4_25.wav',
-        '..\\data\\xyt\\record_generate5_25.wav', '..\\data\\xyt\\record_generate6_25.wav',
-        '..\\data\\xyt\\record_generate7_25.wav', '..\\data\\xyt\\record_generate8_25.wav'
+        '..\\data\\3\\record_generate1_25.wav', '..\\data\\3\\record_generate2_25.wav',
+        '..\\data\\3\\record_generate3_25.wav', '..\\data\\3\\record_generate4_25.wav',
+        '..\\data\\3\\record_generate5_25.wav', '..\\data\\3\\record_generate6_25.wav',
+        '..\\data\\3\\record_generate7_25.wav', '..\\data\\3\\record_generate8_25.wav'
     ],
     [
-        '..\\data\\lshenr\\record_generate1_25.wav', '..\\data\\lshenr\\record_generate2_25.wav',
-        '..\\data\\lshenr\\record_generate3_25.wav', '..\\data\\lshenr\\record_generate4_25.wav',
-        '..\\data\\lshenr\\record_generate5_25.wav', '..\\data\\lshenr\\record_generate6_25.wav',
-        '..\\data\\lshenr\\record_generate7_25.wav'
+        '..\\data\\1\\record_generate1_25.wav', '..\\data\\1\\record_generate2_25.wav',
+        '..\\data\\1\\record_generate3_25.wav', '..\\data\\1\\record_generate4_25.wav',
+        '..\\data\\1\\record_generate5_25.wav', '..\\data\\1\\record_generate6_25.wav',
+        '..\\data\\1\\record_generate7_25.wav'
     ],
     [
-        '..\\data\\lsr\\audio25(1).wav', '..\\data\\lsr\\audio25(2).wav', '..\\data\\lsr\\audio25(3).wav',
-        '..\\data\\lsr\\audio25(4).wav', '..\\data\\lsr\\audio25(5).wav', '..\\data\\lsr\\audio25(6).wav'
+        '..\\data\\2\\audio25(1).wav', '..\\data\\2\\audio25(2).wav', '..\\data\\2\\audio25(3).wav',
+        '..\\data\\2\\audio25(4).wav', '..\\data\\2\\audio25(5).wav', '..\\data\\2\\audio25(6).wav'
     ],
     [
-        '..\\data\\lhb\\record_generate1_25.wav', '..\\data\\lhb\\record_generate2_25.wav',
-        '..\\data\\lhb\\record_generate3_25.wav', '..\\data\\lhb\\record_generate4_25.wav',
-        '..\\data\\lhb\\record_generate5_25.wav', '..\\data\\lhb\\record_generate6_25.wav',
-        '..\\data\\lhb\\record_generate7_25.wav', '..\\data\\lhb\\record_generate8_25.wav',
+        '..\\data\\0\\record_generate1_25.wav', '..\\data\\0\\record_generate2_25.wav',
+        '..\\data\\0\\record_generate3_25.wav', '..\\data\\0\\record_generate4_25.wav',
+        '..\\data\\0\\record_generate5_25.wav', '..\\data\\0\\record_generate6_25.wav',
+        '..\\data\\0\\record_generate7_25.wav', '..\\data\\0\\record_generate8_25.wav',
     ]
 ]
 
@@ -106,7 +106,7 @@ for user_files in wav_files_list:
     transformed = (user_feats_matrix - mean) @ VT.T[:, selected_indices]
     user_profiles.append(np.mean(transformed, axis=0))
 
-user_ids = ['xyt', 'lshenr', 'lsr']
+user_ids = ['3', '1', '2']
 
 new_list = ['..\\data\\survey1\\record_generate2_25.wav', '..\\data\\survey2\\record_generate2_25.wav',
             '..\\data\\survey3\\record_generate2_25.wav', '..\\data\\survey4\\record_generate2_25.wav',
