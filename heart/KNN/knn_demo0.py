@@ -9,13 +9,15 @@ from sklearn.model_selection import KFold, GridSearchCV
 from sklearn.metrics import accuracy_score
 from typing import List, Tuple
 from tqdm import tqdm
+from sklearn.ensemble import VotingClassifier
+from collections import Counter
 
 # ======================== 参数配置 ========================
 N_MFCC = 15
 HOP_LENGTH = 480
 N_FFT = 2048
 USE_SVD = True
-DROP_FIRST_N_COMPONENTS = 2
+DROP_FIRST_N_COMPONENTS = 0
 SVD_VAR_RETAIN = 0.9
 TRAIN_PATH = "../dataSet_wav_1epoch"
 N_SPLITS = 5
@@ -69,7 +71,7 @@ def train_svm_with_cv(X: np.ndarray, y: np.ndarray) -> Tuple[SVC, StandardScaler
     X_scaled = scaler.fit_transform(X)
 
     param_grid = {
-        'C': [0.01, 0.1, 1, 10, 100],
+        'C': [100],
         'kernel': ['rbf'],
         'decision_function_shape': ['ovr']
     }
@@ -100,18 +102,38 @@ if __name__ == "__main__":
     kf = KFold(n_splits=N_SPLITS, shuffle=True, random_state=42)
     accuracies = []
 
+    models = []
+    scalers = []
+    all_preds = []
+    all_gts = []
+
     for fold, (train_idx, val_idx) in enumerate(tqdm(kf.split(X_all), total=N_SPLITS, desc="K-Fold"), 1):
         X_train, X_val = X_all[train_idx], X_all[val_idx]
         y_train, y_val = y_all[train_idx], y_all[val_idx]
 
         clf, scaler, best_params = train_svm_with_cv(X_train, y_train)
+        models.append(clf)
+        scalers.append(scaler)
 
-        X_val_scaled = scaler.transform(X_val)
-        y_pred = clf.predict(X_val_scaled)
-        acc = accuracy_score(y_val, y_pred)
+        # 每个模型在验证集上预测
+        val_preds = []
+        for model, sc in zip(models, scalers):
+            pred = model.predict(sc.transform(X_val))
+            val_preds.append(pred)
 
-        print(f"✅ 第 {fold} 折 准确率: {acc:.2%}，最佳参数: {best_params}")
+        # 投票融合
+        val_preds = np.array(val_preds)
+        final_pred = []
+        for i in range(val_preds.shape[1]):
+            votes = val_preds[:, i]
+            majority = Counter(votes).most_common(1)[0][0]
+            final_pred.append(majority)
 
-        accuracies.append(acc)
+        acc = accuracy_score(y_val, final_pred)
+        print(f"✅ 第 {fold} 折融合投票准确率: {acc:.2%}")
 
-    print(f"\n🎯 平均准确率（{N_SPLITS} 折）: {np.mean(accuracies):.2%}")
+        all_preds.extend(final_pred)
+        all_gts.extend(y_val)
+
+    final_acc = accuracy_score(all_gts, all_preds)
+    print(f"\n🎯 最终融合预测准确率（{N_SPLITS} 折）: {final_acc:.2%}")
