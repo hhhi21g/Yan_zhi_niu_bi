@@ -15,3 +15,6 @@ dataSet_wav_2epoch/
 testSet_wav_1epoch/
 testSet_wav_2epoch/
 disease/
+SVM/
+!/SVM/demo0.py
+dataSet_pic_1epoch/

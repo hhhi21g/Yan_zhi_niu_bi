@@ -98,7 +98,7 @@ def ica_proc(reference_frequency, cutoff_frequency, file_path):
     print("估计的混合矩阵:\n", A_estimated)
     return sample_rate, S_estimated
 
-cnt = 2
+cnt = 0
 def process_file(file_path, output_folder, reference_frequencies=21000, window=0.6):
     global cnt
     file_name = os.path.splitext(os.path.basename(file_path))[0]
@@ -127,7 +127,7 @@ def process_file(file_path, output_folder, reference_frequencies=21000, window=0
     os.makedirs(output_folder, exist_ok=True)
 
     # for j in range(2, len(split_point)-1):
-    for j in range(2, len(split_point) - 1, 2):
+    for j in range(1, len(split_point) - 1, 1):
         start = split_point[j - 1]
         end = split_point[j+1]
 
@@ -135,19 +135,30 @@ def process_file(file_path, output_folder, reference_frequencies=21000, window=0
             continue
 
         segment_audio = audio[start:end]
-        output_path = os.path.join(output_folder, f"segment_{cnt - 2}.wav")
-        sf.write(output_path, segment_audio.astype(np.float32), samplerate=96000)
-        print(f"✅ 已保存: {output_path}")
+        # 生成时间轴（单位：秒）
+        time_axis = np.linspace(start / sample_rate, end / sample_rate, len(segment_audio))
+
+        # 创建图像保存路径
+        output_path = os.path.join(output_folder, f"segment_{cnt}.png")
+
+        # 绘图并保存为图片
+        plt.figure(figsize=(8, 3))
+        plt.plot(time_axis, segment_audio, linewidth=1)
+        plt.title(f"Segment {cnt}")
+        plt.xlabel("Time (s)")
+        plt.ylabel("Amplitude")
+        plt.tight_layout()
+        plt.savefig(output_path)
+        plt.close()
+        print(f"🖼️ 已保存图片: {output_path}")
+
         cnt = cnt + 1
 
 
 
-
-
-
 def main():
-    input_folder = "..\\dataSet_original\\3"  # 输入 .m4a 文件夹
-    output_folder = "..\\dataSet_wav_2epoch\\3"  # 输出 .wav 分段文件夹
+    input_folder = "..\\dataSet_original\\lhb"  # 输入 .m4a 文件夹
+    output_folder = "..\\dataSet_pic_1epoch\\0"  # 输出 .wav 分段文件夹
 
     for file in os.listdir(input_folder):
         if file.endswith(".m4a"):

@@ -12,13 +12,13 @@ from tqdm import tqdm
 from sklearn.ensemble import VotingClassifier
 from collections import Counter
 
-# ======================== 参数配置 ========================
+
 N_MFCC = 15
 HOP_LENGTH = 480
 N_FFT = 2048
 USE_SVD = True
 DROP_FIRST_N_COMPONENTS = 0
-SVD_VAR_RETAIN = 0.9
+SVD_VAR_RETAIN = 1
 TRAIN_PATH = "../dataSet_wav_1epoch"
 N_SPLITS = 5
 # ==========================================================

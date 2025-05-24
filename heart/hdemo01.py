@@ -8,7 +8,7 @@ from scipy.spatial.distance import euclidean
 import soundfile as sf
 
 matplotlib.use('TkAgg')
-y, sr = librosa.load("disease\\AS_New\\New_AS_001.wav", sr=11025)
+y, sr = librosa.load("dataSet\\a0001.wav", sr=11025)
 time = np.arange(len(y)) / sr  # 时间轴（秒）
 
 
